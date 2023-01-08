@@ -3,7 +3,7 @@ on:
   push:
     branches-ignore:
       - main
-      - dev
+      - staging
   pull_request: {}
 
 permissions:

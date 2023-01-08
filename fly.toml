@@ -1,4 +1,4 @@
-app = "be-a-great-coder-remix-c55d"
+app = "be-a-great-coder-c55d"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]

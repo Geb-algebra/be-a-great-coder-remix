@@ -78,7 +78,7 @@ jobs:
           useLockFile: false
 
       - name: ⚡ Run vitest
-        run: npm run test -- --coverage
+        run: npm run test:unit:ci -- --coverage
 
   # cypress:
   #   name: ⚫️ Cypress

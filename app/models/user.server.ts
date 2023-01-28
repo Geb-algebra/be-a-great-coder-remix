@@ -5,15 +5,15 @@ import { prisma } from "~/db.server";
 
 export type { User } from "@prisma/client";
 
-export async function getUserById(id: User["id"]) {
+export const getUserById = async (id: User["id"]) => {
   return prisma.user.findUnique({ where: { id } });
 }
 
-export async function getUserByName(name: User["name"]) {
+export const getUserByName = async (name: User["name"]) => {
   return prisma.user.findUnique({ where: { name } });
 }
 
-export async function createUser(name: User["name"], password: string) {
+export const createUser = async (name: User["name"], password: string) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   return prisma.user.create({
@@ -28,14 +28,14 @@ export async function createUser(name: User["name"], password: string) {
   });
 }
 
-export async function deleteUserByName(name: User["name"]) {
+export const deleteUserByName = async (name: User["name"]) => {
   return prisma.user.delete({ where: { name } });
 }
 
-export async function verifyLogin(
+export const verifyLogin = async (
   name: User["name"],
   password: Password["hash"]
-) {
+) => {
   const userWithPassword = await prisma.user.findUnique({
     where: { name },
     include: {

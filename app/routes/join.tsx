@@ -5,8 +5,8 @@ import * as React from "react";
 
 import { getUserId, createUserSession } from "~/session.server";
 
-import { createUser, getUserByEmail } from "~/models/user.server";
-import { safeRedirect, validateEmail } from "~/utils";
+import { createUser, getUserByName } from "~/models/user.server";
+import { safeRedirect } from "~/utils";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await getUserId(request);
@@ -16,37 +16,37 @@ export async function loader({ request }: LoaderArgs) {
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
-  const email = formData.get("email");
+  const name = formData.get("name");
   const password = formData.get("password");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
 
-  if (!validateEmail(email)) {
+  if (typeof name !== "string") {
     return json(
-      { errors: { email: "Email is invalid", password: null } },
+      { errors: { name: "Username is invalid", password: null } },
       { status: 400 }
     );
   }
 
   if (typeof password !== "string" || password.length === 0) {
     return json(
-      { errors: { email: null, password: "Password is required" } },
+      { errors: { name: null, password: "Password is required" } },
       { status: 400 }
     );
   }
 
   if (password.length < 8) {
     return json(
-      { errors: { email: null, password: "Password is too short" } },
+      { errors: { name: null, password: "Password is too short" } },
       { status: 400 }
     );
   }
 
-  const existingUser = await getUserByEmail(email);
+  const existingUser = await getUserByName(name);
   if (existingUser) {
     return json(
       {
         errors: {
-          email: "A user already exists with this email",
+          name: "A user already exists with this name",
           password: null,
         },
       },
@@ -54,7 +54,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const user = await createUser(email, password);
+  const user = await createUser(name, password);
 
   return createUserSession({
     request,
@@ -74,12 +74,12 @@ export default function Join() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
   const actionData = useActionData<typeof action>();
-  const emailRef = React.useRef<HTMLInputElement>(null);
+  const nameRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (actionData?.errors?.email) {
-      emailRef.current?.focus();
+    if (actionData?.errors?.name) {
+      nameRef.current?.focus();
     } else if (actionData?.errors?.password) {
       passwordRef.current?.focus();
     }
@@ -91,27 +91,26 @@ export default function Join() {
         <Form method="post" className="space-y-6">
           <div>
             <label
-              htmlFor="email"
+              htmlFor="name"
               className="block text-sm font-medium text-gray-700"
             >
-              Email address
+              Name
             </label>
             <div className="mt-1">
               <input
-                ref={emailRef}
-                id="email"
+                ref={nameRef}
+                id="name"
                 required
                 autoFocus={true}
-                name="email"
-                type="email"
-                autoComplete="email"
-                aria-invalid={actionData?.errors?.email ? true : undefined}
-                aria-describedby="email-error"
+                name="name"
+                type="text"
+                aria-invalid={actionData?.errors?.name ? true : undefined}
+                aria-describedby="name-error"
                 className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
               />
-              {actionData?.errors?.email && (
-                <div className="pt-1 text-red-700" id="email-error">
-                  {actionData.errors.email}
+              {actionData?.errors?.name && (
+                <div className="pt-1 text-red-700" id="name-error">
+                  {actionData.errors.name}
                 </div>
               )}
             </div>

@@ -104,7 +104,7 @@ describe("verifyLogin", async () => {
   })
   it("should return user info except the password", async () => {
     const userInfo = await verifyLogin(name, password)
-    expect(new Set(Object.keys(userInfo))).toEqual(new Set([
+    expect(new Set(Object.keys(userInfo!))).toEqual(new Set([
       "id", "name", "createdAt", "updatedAt"
     ]))
   })

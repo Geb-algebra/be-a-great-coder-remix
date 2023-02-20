@@ -3,5 +3,11 @@ node_modules
 /build
 /public/build
 .env
+.prettierrc
 
 /app/styles/tailwind.css
+
+*.json
+*.yml
+*.yaml
+*.md

@@ -26,8 +26,15 @@ model Password {
     userId String @unique
 }
 
+model AtCoderAPIFetchLog {
+    id        String   @id @default(cuid())
+    endpoint  String
+    timestamp DateTime @default(now())
+    status    Int
+}
+
 model Problem {
-    id         String @id @default(cuid())
+    id         String @id
     title      String
     difficulty Int
 

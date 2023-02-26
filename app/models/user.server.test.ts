@@ -1,6 +1,5 @@
 import type { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { describe, it } from 'vitest';
 
 import { prisma } from '~/db.server';
 
@@ -12,6 +11,9 @@ import {
   verifyLogin,
 } from '~/models/user.server';
 
+beforeAll(async () => {
+  await prisma.user.deleteMany();
+});
 afterEach(async () => {
   await prisma.user.deleteMany();
 });

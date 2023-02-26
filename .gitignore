@@ -9,5 +9,6 @@ npm-cache
 /cypress/videos
 /prisma/data.db
 /prisma/data.db-journal
+/coverage
 
 /app/styles/tailwind.css

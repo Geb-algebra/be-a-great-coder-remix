@@ -42,14 +42,12 @@ model Problem {
 }
 
 model Order {
-    id                String    @id @default(cuid())
-    prob_class        String
-    fixed_revenue     BigInt
-    variable_revenue  BigInt
-    fixed_cost        BigInt
-    investment        BigInt?
-    received_datetime DateTime?
-    cleared_datetime  DateTime?
+    id               String    @id @default(cuid())
+    fixedRevenue     Int
+    variableRevenue  Int
+    investment       Int?
+    receivedDatetime DateTime?
+    clearedDatetime  DateTime?
 
     problem   Problem @relation(fields: [problemId], references: [id])
     problemId String
@@ -62,14 +60,14 @@ model Capital {
     id            String @id @default(cuid())
     name          String
     roiFuncIndex  Float
-    maxInvestment BigInt
+    maxInvestment Int
 
     Investment Investment[]
 }
 
 model Investment {
     id     String @id @default(cuid())
-    amount BigInt
+    amount Int
 
     capital   Capital @relation(fields: [capitalId], references: [id])
     capitalId String

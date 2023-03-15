@@ -17,13 +17,15 @@ import { useOptionalUser } from '~/utils';
 // import ContentMainText from '~/components/ContentMainText';
 // import CardBase from '~/components/old/CardBase';
 import StatusCard from '~/components/StatusCard';
+import { authenticator } from '~/services/auth.server';
 // import MainCard from '~/components/MainCard';
 // import NavBar from '~/components/NavBar';
 // import OrdersCard from '~/components/OrdersCard';
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const userId = await getUserId(request);
-  if (!userId) return redirect('/login');
+  const userId = await authenticator.isAuthenticated(request, {
+    failureRedirect: '/login',
+  });
   const user = await getUserById(userId);
   const totalAssets = await getTotalAssets(userId);
   const credibility = await getCredibility(userId);

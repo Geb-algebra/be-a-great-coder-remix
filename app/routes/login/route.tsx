@@ -3,9 +3,14 @@ import { json, redirect } from '@remix-run/node';
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react';
 import * as React from 'react';
 
-import { createUserSession, getUserId } from '~/session.server';
+import { createUserSession, getSession, getUserId } from '~/session.server';
 import { verifyLogin } from '~/models/user.server';
 import { safeRedirect } from '~/utils';
+import {
+  authenticateAndReturnFormError,
+  authenticator,
+  validateAuthForm,
+} from '~/services/auth.server';
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await getUserId(request);
@@ -14,35 +19,7 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export async function action({ request }: ActionArgs) {
-  const formData = await request.formData();
-  const name = formData.get('name');
-  const password = formData.get('password');
-  const redirectTo = safeRedirect(formData.get('redirectTo'), '/home');
-  const remember = formData.get('remember');
-
-  if (typeof name !== 'string') {
-    return json({ errors: { name: 'Username is invalid', password: null } }, { status: 400 });
-  }
-  if (typeof password !== 'string' || password.length === 0) {
-    return json({ errors: { name: null, password: 'Password is required' } }, { status: 400 });
-  }
-
-  if (password.length < 8) {
-    return json({ errors: { name: null, password: 'Password is too short' } }, { status: 400 });
-  }
-
-  const user = await verifyLogin(name, password);
-
-  if (!user) {
-    return json({ errors: { name: 'Invalid name or password', password: null } }, { status: 400 });
-  }
-
-  return createUserSession({
-    request,
-    userId: user.id,
-    remember: remember === 'on' ? true : false,
-    redirectTo,
-  });
+  return await authenticateAndReturnFormError(request);
 }
 
 export const meta: MetaFunction = () => {
@@ -53,16 +30,18 @@ export const meta: MetaFunction = () => {
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/';
+  const redirectTo = searchParams.get('redirectTo') || '/home';
   const actionData = useActionData<typeof action>();
   const nameRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (actionData?.errors?.name) {
-      nameRef.current?.focus();
-    } else if (actionData?.errors?.password) {
-      passwordRef.current?.focus();
+    if (typeof actionData !== 'string') {
+      if (actionData?.errors?.username) {
+        nameRef.current?.focus();
+      } else if (actionData?.errors?.password) {
+        passwordRef.current?.focus();
+      }
     }
   }, [actionData]);
 
@@ -71,24 +50,24 @@ export default function LoginPage() {
       <div className="mx-auto w-full max-w-md px-8">
         <Form method="post" className="space-y-6">
           <div>
-            <label htmlFor="name" className="text-gray-700 block text-sm font-medium">
+            <label htmlFor="username" className="text-gray-700 block text-sm font-medium">
               Name
             </label>
             <div className="mt-1">
               <input
                 ref={nameRef}
-                id="name"
+                id="username"
                 required
                 autoFocus={true}
-                name="name"
+                name="username"
                 type="text"
-                aria-invalid={actionData?.errors?.name ? true : undefined}
-                aria-describedby="name-error"
+                aria-invalid={actionData?.errors?.username ? true : undefined}
+                aria-describedby="username-error"
                 className="border-gray-500 w-full rounded border px-2 py-1 text-lg"
               />
-              {actionData?.errors?.name && (
+              {actionData?.errors?.username && (
                 <div className="text-red-700 pt-1" id="name-error">
-                  {actionData.errors.name}
+                  {actionData.errors.username}
                 </div>
               )}
             </div>

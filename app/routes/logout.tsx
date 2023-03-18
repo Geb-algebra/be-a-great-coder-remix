@@ -8,5 +8,5 @@ export async function action({ request }: ActionArgs) {
 }
 
 export async function loader() {
-  return redirect('/');
+  return redirect('/home');
 }

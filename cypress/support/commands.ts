@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+import { consts } from './consts';
 
 declare global {
   namespace Cypress {
@@ -38,46 +38,59 @@ declare global {
        *    cy.visitAndCheck('/', 500)
        */
       visitAndCheck: typeof visitAndCheck;
+
+      /**
+       * Reset DB
+       */
+      resetDB: typeof resetDB;
     }
   }
 }
 
 function login({
-  email = faker.internet.email(undefined, undefined, "example.com"),
+  username = consts.username,
 }: {
-  email?: string;
+  username?: string;
 } = {}) {
-  cy.then(() => ({ email })).as("user");
+  cy.then(() => ({ username })).as('user');
   cy.exec(
-    `npx ts-node --require tsconfig-paths/register ./cypress/support/create-user.ts "${email}"`
+    `npx ts-node --require tsconfig-paths/register ./cypress/support/create-user.ts "${username}"`,
   ).then(({ stdout }) => {
     const cookieValue = stdout
-      .replace(/.*<cookie>(?<cookieValue>.*)<\/cookie>.*/s, "$<cookieValue>")
+      .replace(/.*<cookie>(?<cookieValue>.*)<\/cookie>.*/s, '$<cookieValue>')
       .trim();
-    cy.setCookie("__session", cookieValue);
+    cy.setCookie('__session', cookieValue);
   });
-  return cy.get("@user");
+  return cy.get('@user');
 }
 
-function cleanupUser({ email }: { email?: string } = {}) {
-  if (email) {
-    deleteUserByEmail(email);
+function cleanupUser({ username }: { username?: string } = {}) {
+  if (username) {
+    deleteUserByName(username);
   } else {
-    cy.get("@user").then((user) => {
-      const email = (user as { email?: string }).email;
-      if (email) {
-        deleteUserByEmail(email);
-      }
-    });
+    try {
+      cy.get('@user').then((user) => {
+        const username = (user as { username?: string }).username;
+        if (username) {
+          deleteUserByName(username);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
-  cy.clearCookie("__session");
+  cy.clearCookie('__session');
 }
 
-function deleteUserByEmail(email: string) {
+function deleteUserByName(username: string) {
   cy.exec(
-    `npx ts-node --require tsconfig-paths/register ./cypress/support/delete-user.ts "${email}"`
+    `npx ts-node --require tsconfig-paths/register ./cypress/support/delete-user.ts "${username}"`,
   );
-  cy.clearCookie("__session");
+  cy.clearCookie('__session');
+}
+
+function resetDB() {
+  cy.exec('npx prisma migrate reset --force');
 }
 
 // We're waiting a second because of this issue happen randomly
@@ -87,9 +100,10 @@ function deleteUserByEmail(email: string) {
 // ===========================================================
 function visitAndCheck(url: string, waitTime: number = 1000) {
   cy.visit(url);
-  cy.location("pathname").should("contain", url).wait(waitTime);
+  cy.location('pathname').should('contain', url).wait(waitTime);
 }
 
-Cypress.Commands.add("login", login);
-Cypress.Commands.add("cleanupUser", cleanupUser);
-Cypress.Commands.add("visitAndCheck", visitAndCheck);
+Cypress.Commands.add('login', login);
+Cypress.Commands.add('cleanupUser', cleanupUser);
+Cypress.Commands.add('visitAndCheck', visitAndCheck);
+Cypress.Commands.add('resetDB', resetDB);

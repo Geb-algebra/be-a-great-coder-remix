@@ -1,8 +1,11 @@
+const { rest } = require('msw');
 const { setupServer } = require('msw/node');
+const { atcoderUserPageMock } = require('./atcoder-user-page');
+const { USERNAME, PASSWORD } = require('./consts');
 
-const server = setupServer();
+const server = setupServer(atcoderUserPageMock);
 
-server.listen({ onUnhandledRequest: 'bypass' });
+server.listen({ onUnhandledRequest: 'warn' });
 console.info('🔶 Mock server running');
 
 process.once('SIGINT', () => server.close());

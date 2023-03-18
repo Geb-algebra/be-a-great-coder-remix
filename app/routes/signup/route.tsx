@@ -3,21 +3,20 @@ import { json, redirect } from '@remix-run/node';
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react';
 import * as React from 'react';
 
-import { getUserId, createUserSession } from '~/session.server';
-
 import { createUser, getUserByName } from '~/models/user.server';
 import { safeRedirect } from '~/utils';
-import {
-  authenticateAndReturnFormError,
-  authenticator,
-  validateAuthForm,
-} from '~/services/auth.server';
+import { authenticateAndReturnFormError, authenticator } from '~/services/auth.server';
 
-export async function loader({ request }: LoaderArgs) {
-  const userId = await authenticator.isAuthenticated(request);
-  if (userId) return redirect('/home');
-  return json({});
-}
+// export async function loader({ request }: LoaderArgs) {
+//   const userId = await authenticator.isAuthenticated(request);
+//   if (userId) return redirect('/home');
+//   return json({});
+// }
+
+const existsAtAtCoder = async (username: string) => {
+  const response = await fetch(`https://atcoder.jp/users/${username}/`);
+  return response.status === 200;
+};
 
 export async function action({ request }: ActionArgs) {
   const form = await request.clone().formData();
@@ -25,6 +24,12 @@ export async function action({ request }: ActionArgs) {
   const password = form.get('password');
   if (typeof username !== 'string') {
     return json({ errors: { username: 'Username is invalid', password: null } }, { status: 400 });
+  }
+  if (!(await existsAtAtCoder(username))) {
+    return json(
+      { errors: { username: `User ${username} is not registered on AtCoder`, password: null } },
+      { status: 400 },
+    );
   }
   if (typeof password !== 'string' || password.length === 0) {
     return json({ errors: { username: null, password: 'Password is required' } }, { status: 400 });
@@ -75,16 +80,16 @@ export default function Join() {
       <div className="mx-auto w-full max-w-md px-8">
         <Form method="post" className="space-y-6">
           <div>
-            <label htmlFor="name" className="text-gray-700 block text-sm font-medium">
+            <label htmlFor="username" className="text-gray-700 block text-sm font-medium">
               AtCoder Username
             </label>
             <div className="mt-1">
               <input
                 ref={nameRef}
-                id="name"
+                id="username"
                 required
                 autoFocus={true}
-                name="name"
+                name="username"
                 type="text"
                 aria-invalid={actionData?.errors?.username ? true : undefined}
                 aria-describedby="name-error"

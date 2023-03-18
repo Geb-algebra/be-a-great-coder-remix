@@ -3,18 +3,12 @@ import { json, redirect } from '@remix-run/node';
 import { Form, Link, useActionData, useSearchParams } from '@remix-run/react';
 import * as React from 'react';
 
-import { createUserSession, getSession, getUserId } from '~/session.server';
-import { verifyLogin } from '~/models/user.server';
-import { safeRedirect } from '~/utils';
-import {
-  authenticateAndReturnFormError,
-  authenticator,
-  validateAuthForm,
-} from '~/services/auth.server';
+import { getUserId } from '~/session.server';
+import { authenticateAndReturnFormError } from '~/services/auth.server';
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await getUserId(request);
-  if (userId) return redirect('/');
+  if (userId) return redirect('/home');
   return json({});
 }
 
@@ -51,7 +45,7 @@ export default function LoginPage() {
         <Form method="post" className="space-y-6">
           <div>
             <label htmlFor="username" className="text-gray-700 block text-sm font-medium">
-              Name
+              AtCoder Username
             </label>
             <div className="mt-1">
               <input
@@ -120,7 +114,7 @@ export default function LoginPage() {
               <Link
                 className="text-blue-500 underline"
                 to={{
-                  pathname: '/join',
+                  pathname: '/signup',
                   search: searchParams.toString(),
                 }}
               >

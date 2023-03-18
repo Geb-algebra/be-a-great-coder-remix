@@ -9,24 +9,21 @@ import { parse } from 'cookie';
 
 import { createUser } from '~/models/user.server';
 import { createUserSession } from '~/session.server';
+import { consts } from './consts';
 
 installGlobals();
 
-async function createAndLogin(email: string) {
-  if (!email) {
-    throw new Error('email required for login');
-  }
-  if (!email.endsWith('@example.com')) {
-    throw new Error('All test emails must end in @example.com');
+async function createAndLogin(username: string) {
+  if (!username) {
+    throw new Error('username required for login');
   }
 
-  const user = await createUser(email, 'myreallystrongpassword');
+  const user = await createUser(username, consts.password);
 
   const response = await createUserSession({
     request: new Request('test://test'),
     userId: user.id,
-    remember: false,
-    redirectTo: '/',
+    redirectTo: '/home',
   });
 
   const cookieValue = response.headers.get('Set-Cookie');

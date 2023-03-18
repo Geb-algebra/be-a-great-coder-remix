@@ -1,16 +1,13 @@
 import { Link, Outlet, useLoaderData } from '@remix-run/react';
 import { json, type LoaderArgs, redirect } from '@remix-run/node';
-// import { getUserById } from '~/models/user.server';
-import { getUserId } from '~/session.server';
+import { getUserById } from '~/models/user.server';
 import {
   getTotalAssets,
   getCredibility,
   getReceivedOrder,
   getUnreceivedOrders,
-  getUserById,
 } from '~/models/mocks.server';
 
-import { useOptionalUser } from '~/utils';
 // import PaperPrev from '~/components/PaperPrev';
 // import PaperNext from '~/components/PaperNext';
 // import PaperCurrent from '~/components/PaperCurrent';

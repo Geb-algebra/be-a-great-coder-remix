@@ -24,6 +24,7 @@ export const loader = async ({ request }: LoaderArgs) => {
     failureRedirect: '/login',
   });
   const user = await getUserById(userId);
+  if (!user) return redirect('/login');
   const totalAssets = await getTotalAssets(userId);
   const credibility = await getCredibility(userId);
   return json({ user, totalAssets, credibility });

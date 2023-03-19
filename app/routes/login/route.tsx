@@ -30,7 +30,7 @@ export default function LoginPage() {
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (typeof actionData !== 'string') {
+    if (actionData) {
       if (actionData?.errors?.username) {
         nameRef.current?.focus();
       } else if (actionData?.errors?.password) {

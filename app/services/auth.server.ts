@@ -24,11 +24,23 @@ export const authenticateAndReturnFormError = async (
   request: Request,
   successRedirect?: string,
 ) => {
-  await authenticator.authenticate('user-pass', request, {
-    successRedirect: successRedirect ?? '/home',
-    failureRedirect: '/login',
-  });
-  const session = await getSession(request);
-  const error = session.get(authenticator.sessionErrorKey);
-  return json({ errors: { username: error.message as string, password: null } }, { status: 400 });
+  try {
+    await authenticator.authenticate('user-pass', request, {
+      successRedirect: successRedirect ?? '/home',
+      // failureRedirect: '/login',
+      throwOnError: true,
+    });
+    // WORKAROUND: the return statement below never executes but, without this, this function may
+    // return undefined and causes type error when using actionData in route modules
+    return json({ errors: { username: null, password: null } }, { status: 400 });
+  } catch (error) {
+    // Because redirects work by throwing a Response, you need to check if the
+    // caught error is a response and return it or throw it again
+    if (error instanceof Response) throw error;
+    if (error instanceof Error) {
+      return json({ errors: { username: error.message, password: null } }, { status: 400 });
+    } else {
+      return json({ errors: { username: 'something wrong', password: null } }, { status: 400 });
+    }
+  }
 };

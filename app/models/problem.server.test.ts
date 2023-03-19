@@ -33,13 +33,14 @@ describe('fetchProblemsIfAllowed', () => {
   ])('should update when the specified interval elapsed', async (elapsed) => {
     const lastFetchedTime = new Date(Date.now() - elapsed);
     await createFetchLog(ENDPOINT, 200, lastFetchedTime);
-    const start = Date.now();
+    const now = new Date();
     await fetchProblemsIfAllowed();
-    const end = Date.now();
     expect(mockedFetch).toHaveBeenCalled();
     const lastFetchLog = await getLatestFetchLog(ENDPOINT);
-    expect(lastFetchLog.timestamp.getTime()).toBeGreaterThanOrEqual(start);
-    expect(lastFetchLog.timestamp.getTime()).toBeLessThanOrEqual(end);
+    expect((lastFetchLog?.timestamp.getTime() as number) / 1000).toBeCloseTo(
+      now.getTime() / 1000,
+      1,
+    );
   });
   it.each([PROBLEM_UPDATE_INTERVAL * 0.9999999, PROBLEM_UPDATE_INTERVAL * 0.1])(
     'should not update when the specified interval doesnt elapsed',

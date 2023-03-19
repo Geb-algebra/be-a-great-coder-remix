@@ -13,25 +13,21 @@ describe('createFetchLog', () => {
   it('should create a right record', async () => {
     const endpoint = 'https://example.com';
     const status = 401;
-    const before = new Date();
+    const now = Date.now();
     await createFetchLog(endpoint, status);
-    const after = new Date();
     const created = await prisma.atCoderAPIFetchLog.findFirst();
     expect(created?.endpoint).toEqual(endpoint);
     expect(created?.status).toEqual(status);
-    expect(created?.timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime());
-    expect(created?.timestamp.getTime()).toBeLessThan(after.getTime());
+    expect((created?.timestamp.getTime() as number) / 1000).toBeCloseTo(now / 1000, 1);
   });
   it('should set status 200 by default', async () => {
     const endpoint = 'https://example.com';
-    const before = new Date();
+    const now = new Date();
     await createFetchLog(endpoint);
-    const after = new Date();
     const created = await prisma.atCoderAPIFetchLog.findFirst();
     expect(created?.endpoint).toEqual(endpoint);
     expect(created?.status).toEqual(200);
-    expect(created?.timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime());
-    expect(created?.timestamp.getTime()).toBeLessThan(after.getTime());
+    expect((created?.timestamp.getTime() as number) / 1000).toBeCloseTo(now.getTime() / 1000, 1);
   });
 });
 

@@ -1,30 +1,30 @@
 import { Link, Outlet, useLoaderData } from '@remix-run/react';
 import { json, type LoaderArgs, redirect } from '@remix-run/node';
-// import { getUserById } from '~/models/user.server';
-import { getUserId } from '~/session.server';
+import { getUserById } from '~/models/user.server';
 import {
   getTotalAssets,
   getCredibility,
   getReceivedOrder,
   getUnreceivedOrders,
-  getUserById,
 } from '~/models/mocks.server';
 
-import { useOptionalUser } from '~/utils';
 // import PaperPrev from '~/components/PaperPrev';
 // import PaperNext from '~/components/PaperNext';
 // import PaperCurrent from '~/components/PaperCurrent';
 // import ContentMainText from '~/components/ContentMainText';
 // import CardBase from '~/components/old/CardBase';
 import StatusCard from '~/components/StatusCard';
+import { authenticator } from '~/services/auth.server';
 // import MainCard from '~/components/MainCard';
 // import NavBar from '~/components/NavBar';
 // import OrdersCard from '~/components/OrdersCard';
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const userId = await getUserId(request);
-  if (!userId) return redirect('/login');
+  const userId = await authenticator.isAuthenticated(request, {
+    failureRedirect: '/login',
+  });
   const user = await getUserById(userId);
+  if (!user) return redirect('/login');
   const totalAssets = await getTotalAssets(userId);
   const credibility = await getCredibility(userId);
   return json({ user, totalAssets, credibility });

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import type { User } from '~/models/user.server';
 
-const DEFAULT_REDIRECT = '/';
+const DEFAULT_REDIRECT = '/home';
 
 /**
  * This should be used any time the redirect path is user-provided

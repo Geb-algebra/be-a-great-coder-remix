@@ -11,5 +11,6 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./test/setup-test-env.ts'],
+    singleThread: true, // set this to avoid multiple tests trying to interact DB at the same time.
   },
 });

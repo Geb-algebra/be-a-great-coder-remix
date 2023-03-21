@@ -1,9 +1,4 @@
-const { rest } = require('msw');
-const { setupServer } = require('msw/node');
-const { atcoderUserPageMock } = require('./atcoder-user-page');
-const { detailedProblemsMock } = require('./detailed-problems');
-
-const server = setupServer(atcoderUserPageMock, detailedProblemsMock);
+const { server } = require('./server');
 
 server.listen({ onUnhandledRequest: 'warn' });
 console.info('🔶 Mock server running');

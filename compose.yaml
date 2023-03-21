@@ -23,4 +23,5 @@ services:
     volumes:
       - .:/code
     working_dir: /code
-    command: bash
+    entrypoint: /code/test/test-entrypoint.sh
+    # command: bash

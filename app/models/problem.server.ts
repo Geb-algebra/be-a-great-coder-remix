@@ -67,8 +67,12 @@ export const queryAllProblemsByDifficulty = async (difficulty: number) => {
   });
 };
 
-export const selectProblemRandomlyWithDifficulty = async (difficulty: number) => {
-  const candidate = await queryAllProblemsByDifficulty(difficulty);
-  const index = Math.floor(Math.random() * candidate.length);
-  return candidate[index];
+/**
+ * fetch all problems and choose one from them randomlu
+ * @param difficulty: 100, 200, 300, 400, 500, 600
+ */
+export const queryRandomProblemByDifficulty = async (difficulty: number) => {
+  const problems = await queryAllProblemsByDifficulty(difficulty);
+  const index = Math.floor(Math.random() * problems.length);
+  return problems[index];
 };

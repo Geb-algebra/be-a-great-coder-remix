@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   test: {
     globals: true,
-    // set environment to jsdom to avoid unsolved error from msw
+    // set environment to node to avoid unsolved error from msw
     // environment: 'jsdom',
     setupFiles: ['./test/setup-test-env.ts'],
     singleThread: true, // set this to avoid multiple tests trying to interact DB at the same time.

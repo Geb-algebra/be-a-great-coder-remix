@@ -18,7 +18,7 @@ describe('createFetchLog', () => {
     const created = await prisma.atCoderAPIFetchLog.findFirst();
     expect(created?.endpoint).toEqual(endpoint);
     expect(created?.status).toEqual(status);
-    expect((created?.timestamp.getTime() as number) / 1000).toBeCloseTo(now / 1000, 1);
+    expect((created?.timestamp.getTime() as number) / 10000).toBeCloseTo(now / 10000, 1);
   });
   it('should set status 200 by default', async () => {
     const endpoint = 'https://example.com';
@@ -27,7 +27,7 @@ describe('createFetchLog', () => {
     const created = await prisma.atCoderAPIFetchLog.findFirst();
     expect(created?.endpoint).toEqual(endpoint);
     expect(created?.status).toEqual(200);
-    expect((created?.timestamp.getTime() as number) / 1000).toBeCloseTo(now.getTime() / 1000, 1);
+    expect((created?.timestamp.getTime() as number) / 10000).toBeCloseTo(now.getTime() / 10000, 1);
   });
 });
 

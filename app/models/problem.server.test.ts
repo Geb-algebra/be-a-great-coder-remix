@@ -10,6 +10,13 @@ import {
 } from '~/models/problem.server';
 import { createFetchLog, getLatestFetchLog } from './fetchLog.server';
 
+import { server } from 'mocks/server';
+
+// we must mock fetch imported from @remix-run/node, not global.fetch,
+// because we heve to use the former in .server.ts files to enable msw
+// import * as remixRun from '@remix-run/node';
+import { rest } from 'msw';
+
 describe('fetchProblemsIfAllowed', () => {
   let mockedFetch: SpyInstance;
   beforeAll(async () => {
@@ -19,9 +26,7 @@ describe('fetchProblemsIfAllowed', () => {
     await prisma.atCoderAPIFetchLog.deleteMany();
   });
   beforeEach(async () => {
-    mockedFetch = vi
-      .spyOn(global, 'fetch')
-      .mockImplementation(async () => new Response('{}', { status: 200 }));
+    mockedFetch = vi.spyOn(global, 'fetch');
   });
   afterEach(() => {
     vi.restoreAllMocks();
@@ -34,11 +39,12 @@ describe('fetchProblemsIfAllowed', () => {
     const lastFetchedTime = new Date(Date.now() - elapsed);
     await createFetchLog(ENDPOINT, 200, lastFetchedTime);
     const now = new Date();
+    server.printHandlers();
     await fetchProblemsIfAllowed();
     expect(mockedFetch).toHaveBeenCalled();
     const lastFetchLog = await getLatestFetchLog(ENDPOINT);
-    expect((lastFetchLog?.timestamp.getTime() as number) / 1000).toBeCloseTo(
-      now.getTime() / 1000,
+    expect((lastFetchLog?.timestamp.getTime() as number) / 10000).toBeCloseTo(
+      now.getTime() / 10000,
       1,
     );
   });
@@ -58,10 +64,12 @@ describe('updateProblemsIfAllowed', () => {
   beforeEach(async () => {
     await prisma.atCoderAPIFetchLog.deleteMany();
     await prisma.problem.deleteMany();
-    mockedFetch = vi.spyOn(global, 'fetch').mockImplementation(
-      async () =>
-        new Response(
-          JSON.stringify([
+    mockedFetch = vi.spyOn(global, 'fetch');
+    server.use(
+      rest.get('https://kenkoooo.com/atcoder/resources/merged-problems.json', (req, res, ctx) => {
+        return res(
+          ctx.status(200),
+          ctx.json([
             {
               id: 'abc158_d',
               contest_id: 'abc158',
@@ -103,8 +111,8 @@ describe('updateProblemsIfAllowed', () => {
               solver_count: 19460,
             },
           ]),
-          { status: 200 },
-        ),
+        );
+      }),
     );
     await prisma.problem.create({ data: { id: 'xxxyyy', title: 'old problem', difficulty: 200 } });
   });

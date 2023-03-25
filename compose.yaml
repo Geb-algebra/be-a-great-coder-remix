@@ -1,7 +1,7 @@
 version: "3"
 services:
   remix:
-    image: node:18
+    image: node:18.14.1
     environment:
       - HOST=0.0.0.0
     ports:
@@ -12,14 +12,12 @@ services:
       - .:/code
     working_dir: /code
     command: bash
-  cypress:
-    image: cypress/base:18.14.1
+  validate:
+    build:
+      context: .
+      dockerfile: ./test/Dockerfile
     environment:
       - HOST=0.0.0.0
-    ports:
-      - 3000:3000
-      - 5555:5555
-      - 8002:8002
     volumes:
       - .:/code
     working_dir: /code

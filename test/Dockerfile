@@ -1,0 +1,6 @@
+ARG CYPRESS_VERSION=12.8.0
+ARG NODE_VERSION=18.14.1
+
+FROM cypress/factory:latest
+
+USER root

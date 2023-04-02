@@ -33,3 +33,24 @@ export const getLatestFetchLog = async (
   });
   return record[0];
 };
+
+/**
+ * fetch from the specified endpoint if the specified interval has passed since the last fetch
+ * @param endpoint: string - a full path to the endpoint
+ * @param interval: number - he required fetching interval in milliseconds
+ * @returns Response | undefined: the response from the endpoint, or undefined if the interval has not passed
+ */
+export const fetchIfAllowed = async (
+  endpoint: string,
+  interval: number,
+): Promise<Response | undefined> => {
+  const latestFetchLog = await getLatestFetchLog(endpoint);
+  const lastFetchTime = latestFetchLog ? latestFetchLog.timestamp.getTime() : 0;
+  if (Date.now() - lastFetchTime > interval) {
+    const res = await fetch(endpoint, { headers: [['ACCEPT-ENCODING', 'gzip']] });
+    await createFetchLog(endpoint, res.status);
+    return res;
+  } else {
+    return;
+  }
+};

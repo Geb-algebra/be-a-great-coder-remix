@@ -6,7 +6,6 @@ installGlobals();
 
 beforeAll(() => {
   server.listen({ onUnhandledRequest: 'warn' });
-  console.info('🔷 Mock server running');
 });
 
 beforeEach(() => server.resetHandlers());

@@ -9,7 +9,7 @@ import { parse } from 'cookie';
 
 import { createUser } from '~/models/user.server';
 import { createUserSession } from '~/session.server';
-import { consts } from './consts';
+import { consts } from '../../test/consts';
 
 installGlobals();
 

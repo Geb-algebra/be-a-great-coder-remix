@@ -1,7 +1,7 @@
 import { json, redirect } from '@remix-run/node';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
-import { getUserByName, verifyLogin } from '~/models/user.server';
+import { getUserById, getUserByName, verifyLogin } from '~/models/user.server';
 
 import { getSession, sessionStorage } from '~/session.server';
 
@@ -43,4 +43,20 @@ export const authenticateAndReturnFormError = async (
       return json({ errors: { username: 'something wrong', password: null } }, { status: 400 });
     }
   }
+};
+
+/**
+ * return User if the user is authenticated and throw redirect to login otherwise
+ * @param request: Request
+ */
+export const getUserIfAuthenticated = async (request: Request) => {
+  const userId = await authenticator.isAuthenticated(request);
+  if (!userId) {
+    throw redirect('/login');
+  }
+  const user = await getUserById(userId);
+  if (!user) {
+    throw redirect('/login');
+  }
+  return user;
 };

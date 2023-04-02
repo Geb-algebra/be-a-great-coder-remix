@@ -39,7 +39,6 @@ describe('fetchProblemsIfAllowed', () => {
     const lastFetchedTime = new Date(Date.now() - elapsed);
     await createFetchLog(ENDPOINT, 200, lastFetchedTime);
     const now = new Date();
-    server.printHandlers();
     await fetchProblemsIfAllowed();
     expect(mockedFetch).toHaveBeenCalled();
     const lastFetchLog = await getLatestFetchLog(ENDPOINT);
